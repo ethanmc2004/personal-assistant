@@ -1,53 +1,44 @@
+import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-import time
+from selenium.webdriver.edge.service import Service
 
-def ask_chatgpt(question, session_url):
-    """
-    Opens Microsoft Edge to the specified ChatGPT session URL,
-    sends a question, and retrieves the response.
-    """
+def ask_chatgpt(question):
+    """Attaches to an existing Edge window, sends a question, and retrieves the response."""
     try:
-        print("Assistant: Opening Edge to your specified ChatGPT session...")
-        # Set up Edge options
-        options = webdriver.EdgeOptions()
-        # (Do not use debugger_address here so it opens a new session)
-        # You can add other options if needed
-        
-        # Initialize the Edge WebDriver (ensure msedgedriver is in PATH or specify full path)
-        driver = webdriver.Edge(options=options)
-        
-        # Navigate to your specific ChatGPT session URL
-        driver.get(session_url)
-        time.sleep(5)  # Wait for the page to load
+        print("Assistant: Attaching to existing Edge ChatGPT session...")
 
-        # Attempt to locate the chat input box
-        print("Assistant: Locating the chat input box...")
+        # Set up Edge options to connect to the running instance
+        edge_options = webdriver.EdgeOptions()
+        edge_options.debugger_address = "127.0.0.1:9222"  # Connect to the open Edge session
+
+        # Attach to the existing Edge window
+        driver = webdriver.Edge(options=edge_options)
+
+        print("Assistant: Connected to existing Edge session.")
+
+        # Ensure ChatGPT is loaded
+        driver.get("https://chat.openai.com/")  # Make sure the tab is correct
+
+        # Wait for the chat input box to be interactable
+        time.sleep(3)  # Small delay to ensure loading
         input_box = driver.find_element(By.TAG_NAME, "textarea")
-        input_box.click()
+
+        # Send the question
         input_box.send_keys(question)
         input_box.send_keys(Keys.RETURN)
 
         print("Assistant: Waiting for ChatGPT response...")
-        time.sleep(10)  # Wait for ChatGPT to process and respond
+        time.sleep(10)  # Wait for response
 
-        # Get the latest response
+        # Extract response
         messages = driver.find_elements(By.CLASS_NAME, "message-text")
         response = messages[-1].text if messages else "No response from ChatGPT."
+
         print("Assistant: ChatGPT Response Retrieved!")
-        
-        driver.quit()  # Close the browser window
+
         return response
 
     except Exception as e:
         return f"Error interacting with ChatGPT: {e}"
-
-if __name__ == "__main__":
-    # Replace with your dedicated ChatGPT session URL.
-    SESSION_URL = "https://chatgpt.com/c/67d0d4cf-c450-8008-a815-11f970366e26"  # Example URL; update as needed.
-    
-    question = "What is the capital of Canada?"
-    answer = ask_chatgpt(question, SESSION_URL)
-    print("Final Answer:", answer)
-
