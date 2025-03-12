@@ -45,7 +45,7 @@ def ask_chatgpt(question, session_url):
 
 if __name__ == "__main__":
     # Replace with your dedicated ChatGPT session URL.
-    SESSION_URL = "https://chat.openai.com/chat"  # Example URL; update as needed.
+    SESSION_URL = "https://chatgpt.com/c/67d0d4cf-c450-8008-a815-11f970366e26"  # Example URL; update as needed.
     
     question = "What is the capital of Canada?"
     answer = ask_chatgpt(question, SESSION_URL)
